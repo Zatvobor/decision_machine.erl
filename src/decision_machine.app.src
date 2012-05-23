@@ -1,0 +1,13 @@
+{application, decision_machine,
+ [
+  {description, "Decision Table implementation for Erlang. Decision tables are a precise yet compact way to model complicated logic."},
+  {vsn, git},
+  {registered, []},
+  {modules, [decision_machine, dm_table]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { decision_machine_app, []}},
+  {env, []}
+ ]}.

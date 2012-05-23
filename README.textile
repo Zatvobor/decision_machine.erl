@@ -1,0 +1,37 @@
+h2. Abstraction
+
+"Decision tables":http://en.wikipedia.org/wiki/Decision_table are a precise yet compact way to model complicated logic.
+
+h2. Decision table internal presentation
+
+decision_table_structure = {
+%%%
+  columns, [
+    { eligible_state, fun dm_table_operations:in/2     },
+    { gender, "Gender  =:= GenderParam"                },
+    { age, fun Module:Function/2                       },
+    { smoke_status, "SmokeStatus =:= SmokeStatusParam" },
+  ],
+
+%%%
+  actions, [
+    { eligibility, fun(true) -> io:format("true eligibility ") end.  },
+    { unacceptability, fun(false) -> io:format("false unacceptability ") end. }
+  ],
+
+%%%
+  table,
+    { columns, [eligible_state, gender, age, smoke_status], actions, [eligibility, unacceptability] rows,
+      [
+        [ ['VA', 'PA', 'NY'], 'Male', [20, 65], 'N', {[true]} ],
+        [ ['VA', 'PA', 'NY'], 'Female', [20, 65], 'N', {[false]} ],
+        [ ['CO', 'LV', 'CA', 'TX'], {[nil, false]} ],
+      ]
+    }
+}.
+
+
+h3. Others
+
+
+"Semantic decision table":http://en.wikipedia.org/wiki/Semantic_decision_table
