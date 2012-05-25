@@ -1,16 +1,35 @@
 -module(dm_table_tests).
 -include_lib("eunit/include/eunit.hrl").
 
+% callback method mock
+-export([init/1]).
 
-new_2_test() ->
-  { dm_table, new_2_test, _ } = dm_table:new(new_2_test, db_table),
-  ?assert(erlang:is_process_alive(whereis(new_2_test))).
-
-new_2_function_test() ->
-  pending.
 
 new_2_module_test() ->
-  pending.
+  {dm_table, new_2_module_test, _} = E = dm_table:new(new_2_module_test, dm_table_tests),
+
+  ?assert(erlang:is_process_alive(whereis(new_2_module_test))),
+
+  assert_new_2_tests(E).
+
+
+new_2_function_test() ->
+  {dm_table, new_2_function_test, _} = E = dm_table:new(new_2_function_test, fun init/1),
+
+  ?assert(erlang:is_process_alive(whereis(new_2_function_test))),
+
+  assert_new_2_tests(E).
+
+
+assert_new_2_tests(E) ->
+  [{column, func}] = E:columns(),
+  [{action, func}] = E:actions().
+
+init(E) ->
+  E:add_column(column, func),
+  E:add_action(action, func),
+
+  E.
 
 
 set_columns_test() ->

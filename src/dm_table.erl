@@ -1,25 +1,7 @@
-%% > EligibilityRules = dm_table:new(eligibility_rules).
 %%
-%% % Setup operation rules
-%% EligibilityRules:add_columns(eligible_state, fun(EligibleStates, Input) ->  EligibleStates =:= Input end).
-%% EligibilityRules:add_columns(gender, fun(Gender, Input) ->  Gender =:= Input end).
-%% EligibilityRules:add_columns(age, fun(Gender, Input) ->  Gender =:= Input end).
+%% For more details about API usage see: test/dm_table_acceptance_test.erl
 %%
-%% % Setup decision actions
-%% EligibilityRules:add_actions(eligibility, fun(true) -> io:format("available") end.).
-%%
-%% % Apply input data and make decision
-%% EligibilityRules:add_decision([['VA', 'PA', 'NY'], 'Male', [20, 65]], [true]).
-%% EligibilityRules:add_decision([['VA', 'PA', 'NY'], 'Female', [20, 65]], [true]).
-%% EligibilityRules:add_decision([['CO', 'LV', 'CA', 'TX']], [nil]).
-%%
-%% % Iterate through decision table 'eligibility_rules' and apply suitable actions
-%% EligibilityRules:make_decision([['VA', 'PA', 'NY'], 'Male', [20, 65]]).
-%% > {eligibility, "available"}
-
-
 -module(dm_table, [Name, UserOptsModule]). % parameterized module
-
 
 -export([new/1, new/2]). % module initialization functions
 
@@ -41,11 +23,18 @@
 new(Name) ->
   new(Name, fun(DmTable) -> DmTable end). % stubbed behavior
 
-new(Name, UserOptsModule) ->
-  Instance = instance(Name, UserOptsModule),
-  Instance:start_link(),
-  Instance.
+new(Name, UserOptsModule) when is_atom(UserOptsModule) ->
+  new(Name, fun UserOptsModule:init/1);
 
+new(Name, UserOptsFun) when is_function(UserOptsFun) ->
+  % 1. initialize p-module
+  Instance = instance(Name, UserOptsFun),
+  % 2. initialize satelite process
+  Instance:start_link(),
+  % 3. apply user defined callback
+  UserOptsFun(Instance),
+  % 4. return instance reference
+  Instance.
 
 
 %% @Public object instance methods
