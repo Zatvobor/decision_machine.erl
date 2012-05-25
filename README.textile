@@ -4,6 +4,8 @@ h2. Abstraction
 
 h2. Decision table internal presentation
 
+"Spreadsheet's decision table":http://technicalmumbojumbo.files.wordpress.com/2009/03/drools-13.jpg
+
 decision_table_structure = {
 %%%
   columns, [
