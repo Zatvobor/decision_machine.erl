@@ -3,7 +3,7 @@
   {description, "Decision Table implementation for Erlang. Decision tables are a precise yet compact way to model complicated logic."},
   {vsn, git},
   {registered, []},
-  {modules, [decision_machine, dm_table]},
+  {modules, [decision_machine, dm_table, dm_table_engine]},
   {applications, [
                   kernel,
                   stdlib

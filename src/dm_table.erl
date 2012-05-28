@@ -133,9 +133,16 @@ init([]) ->
 handle_call({fetch_decision_table}, _From, State) ->
   {reply, State, State};
 
-handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = _State) ->
-  {_, _, _, _, rows, Rows} = T,
-  e.
+handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = State) ->
+  Engine = dm_table_engine:new(C, A, T),
+
+  % 1 map column function to user's input list
+  InputListExtended = Engine:map_column_functions(InputList),
+
+  % 2 apply input for decision table rows, fire actions, return execution log
+  ActionExecutionLog = Engine:foreach_table_rows_tail(InputListExtended),
+
+  {reply, ActionExecutionLog, State}.
 
 
 handle_cast({push_decision_table, NewState}, _State) ->

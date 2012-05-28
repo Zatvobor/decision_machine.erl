@@ -36,7 +36,6 @@ Inspired by "Spreadsheet's decision table":http://technicalmumbojumbo.files.word
 
 h3. TODO
 
-- extract all gen_server's stuff from 'dm_table' to 'dm_table_process'
 - remove redundant '{columns, _, actions, _}' index;
 - switch decisions's table internal from lists to arrays (so as used index based lookups);
 - implement text-based operations such as '{ gender, "Gender  =:= GenderParam" }'

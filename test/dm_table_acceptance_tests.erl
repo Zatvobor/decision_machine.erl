@@ -2,7 +2,6 @@
 -include_lib("eunit/include/eunit.hrl").
 
 
-try_to_make_decision_test_() -> pending.
 %% > EligibilityRules = dm_table:new(eligibility_rules).
 %%
 %% % Setup operation's rules
