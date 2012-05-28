@@ -2,38 +2,41 @@ h2. Abstraction
 
 "Decision tables":http://en.wikipedia.org/wiki/Decision_table are a precise yet compact way to model complicated logic.
 
-h2. Decision table internal presentation
+h2. Decision table internal structure
 
-"Spreadsheet's decision table":http://technicalmumbojumbo.files.wordpress.com/2009/03/drools-13.jpg
+Inspired by "Spreadsheet's decision table":http://technicalmumbojumbo.files.wordpress.com/2009/03/drools-13.jpg
 
-decision_table_structure = {
+-record(decision_table, {
 %%%
-  columns, [
+  columns = [
     { eligible_state, fun dm_table_operations:in/2     },
-    { gender, "Gender  =:= GenderParam"                },
-    { age, fun Module:Function/2                       },
-    { smoke_status, "SmokeStatus =:= SmokeStatusParam" },
+    { gender, "Gender  =:= GenderInput"                },
+    { age, fun UserOptsModule:Function/2               },
+    { smoke_status, "SmokeStatus =:= SmokeStatusInput" },
   ],
 
 %%%
-  actions, [
-    { eligibility, fun(true) -> io:format("true eligibility ") end.  },
-    { unacceptability, fun(false) -> io:format("false unacceptability ") end. }
+  actions = [
+    { eligibility, fun(InputList) -> eligibility end.         },
+    { unacceptability, fun(InputList) -> unacceptability end. }
   ],
 
 %%%
-  table,
-    { columns, [eligible_state, gender, age, smoke_status], actions, [eligibility, unacceptability] rows,
-      [
+  table =
+    { columns, [eligible_state, gender, age, smoke_status],
+      actions, [eligibility, unacceptability]
+      rows,    [
         [ ['VA', 'PA', 'NY'], 'Male', [20, 65], 'N', {[true]} ],
-        [ ['VA', 'PA', 'NY'], 'Female', [20, 65], 'N', {[false]} ],
-        [ ['CO', 'LV', 'CA', 'TX'], {[nil, false]} ],
+        [ ['VA', 'PA', 'NY'], 'Female', [20, 65], 'N', {[true]} ],
+        [ ['CO', 'LV', 'CA', 'TX'], {[nil, true]} ],
       ]
     }
 }.
 
 
-h3. Others
+h3. TODO
 
-
-"Semantic decision table":http://en.wikipedia.org/wiki/Semantic_decision_table
+- extract all gen_server's stuff from 'dm_table' to 'dm_table_process'
+- remove redundant '{columns, _, actions, _}' index;
+- switch decisions's table internal from lists to arrays (so as used index based lookups);
+- implement text-based operations such as '{ gender, "Gender  =:= GenderParam" }'

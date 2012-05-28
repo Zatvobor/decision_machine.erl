@@ -9,6 +9,7 @@
 -export([columns/0, columns/1, set_columns/1, add_column/2]).
 -export([actions/0, actions/1, set_actions/1, add_action/2]).
 -export([table/0, table/1, set_decisions/1, add_decision/2]).
+-export([make_decision/1]).
 
 % spawned process stuff (belongs to current object instance)
 -behavior(gen_server).
@@ -42,7 +43,7 @@ new(Name, UserOptsFun) when is_function(UserOptsFun) ->
 columns() ->
   columns(gen_server:call(Name, {fetch_decision_table})).
 
-columns(#decision_table{ columns = C} = _T) ->
+columns(#decision_table{columns = C} = _T) ->
   C.
 
 
@@ -102,6 +103,10 @@ add_decision(Row, Actions) ->
   set_decisions(RowsList ++ ([Row ++ [ {Actions} ]])).
 
 
+make_decision(InputList) ->
+  gen_server:call(Name, {find_a_match_and_execute_actions, InputList}).
+
+
 
 %% @Inernal instance stuff
 
@@ -126,7 +131,11 @@ init([]) ->
 
 
 handle_call({fetch_decision_table}, _From, State) ->
-  {reply, State, State}.
+  {reply, State, State};
+
+handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = _State) ->
+  {_, _, _, _, rows, Rows} = T,
+  e.
 
 
 handle_cast({push_decision_table, NewState}, _State) ->
