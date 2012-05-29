@@ -1,6 +1,10 @@
 h2. Abstraction
 
-"Decision tables":http://en.wikipedia.org/wiki/Decision_table are a precise yet compact way to model complicated logic.
+Erlang based experimental implementation of "Decision tables":http://en.wikipedia.org/wiki/Decision_table. Decision tables are a precise yet compact way to model complicated logic.
+
+h2. Usage
+
+First of all, see 'test/dm_table_acceptance_tests:make_decision_test_/0'
 
 h2. Decision table internal structure
 
@@ -36,6 +40,7 @@ Inspired by "Spreadsheet's decision table":http://technicalmumbojumbo.files.word
 
 h3. TODO
 
+- hide internal functions through -ifdef(TEST) declaration;
 - remove redundant '{columns, _, actions, _}' index;
-- switch decisions's table internal from lists to arrays (so as used index based lookups);
-- implement text-based operations such as '{ gender, "Gender  =:= GenderParam" }'
+- switch decisions's table internal from lists to arrays;
+- implement DSL-based rules prerequisites such as '{ gender, "Gender  =:= GenderParam" }'

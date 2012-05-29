@@ -10,20 +10,37 @@ column_stub(_One, _Two) ->
 
 before_each() ->
   C = [{a, fun_column_stub}, {b, fun_column_stub}],
-  A = [{title, fun action_stub/1}],
-  R = {undefined, undefined, undefined, undefined, rows, [[ a, b, {[true]}]]},
+  A = [{title, fun_action_stub}],
+  T = {undefined, undefined, undefined, undefined, rows, [[ a, b, {[true]}]]},
 
-  {C, A, R}.
+  dm_table_engine:new(C,A,T).
 
 map_column_functions_test_() ->
-  Scenario = fun({C, A, R}) ->
-    Engine = dm_table_engine:new(C,A,R),
-    InputListExtended = Engine:map_column_functions([c,d]),
+  Scenario = fun(Engine) ->
+    Actual = Engine:map_column_functions([c,d]),
 
-    InputListExtendedSpecification = [{input, c, func, fun_column_stub, n, 1}, {input, d, func, fun_column_stub, n, 2}],
+    Expected = [[{input, c}, {func, fun_column_stub}, {n, 1}], [{input, d}, {func, fun_column_stub}, {n, 2}]],
 
     % test definitions
-    [?_assertMatch(InputListExtendedSpecification, InputListExtended)]
+    [?_assertMatch(Expected, Actual)]
   end,
 
   {"Map column function to user's input list", {setup, fun before_each/0, Scenario}}.
+
+
+map_cells_value_and_action_functions_test_() ->
+  Scenario = fun(Engine) ->
+    InputListExtended = Engine:map_column_functions([c,d]),
+    Actual = Engine:map_cells_value_and_action_functions(InputListExtended, [ a, b, {[true, false, nil]}]),
+
+    Expected = {
+      row,
+        [[{cell, a}, {input, c}, {func, fun_column_stub}, {n, 1}], [{cell, b}, {input, d}, {func, fun_column_stub}, {n, 2}]],
+      actions,
+        [fun_action_stub]
+    },
+
+    [?_assertMatch(Expected, Actual)]
+  end,
+
+  {"Map cells value and actions", {setup, fun before_each/0, Scenario}}.

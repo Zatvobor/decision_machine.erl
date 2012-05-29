@@ -104,7 +104,7 @@ add_decision(Row, Actions) ->
 
 
 make_decision(InputList) ->
-  gen_server:call(Name, {find_a_match_and_execute_actions, InputList}).
+  gen_server:call(Name, {find_match_and_execute_actions, InputList}).
 
 
 
@@ -139,7 +139,7 @@ handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{
   % 1 map column function to user's input list
   InputListExtended = Engine:map_column_functions(InputList),
 
-  % 2 apply input for decision table rows, fire actions, return execution log
+  % 2 apply input for decision table, fire actions, return execution log
   ActionExecutionLog = Engine:foreach_table_rows_tail(InputListExtended),
 
   {reply, ActionExecutionLog, State}.
