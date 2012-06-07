@@ -1,46 +1,7 @@
 h2. Abstraction
 
-Erlang based experimental implementation of "Decision tables":http://en.wikipedia.org/wiki/Decision_table. Decision tables are a precise yet compact way to model complicated logic.
+Erlang based *experimental* implementation of "Decision tables":http://en.wikipedia.org/wiki/Decision_table. Decision tables are a precise yet compact way to model complicated logic.
 
 h2. Usage
 
-First of all, see 'test/dm_table_acceptance_tests:make_decision_test_/0'
-
-h2. Decision table internal structure
-
-Inspired by "Spreadsheet's decision table":http://technicalmumbojumbo.files.wordpress.com/2009/03/drools-13.jpg
-
--record(decision_table, {
-%%%
-  columns = [
-    { eligible_state, fun dm_table_operations:in/2     },
-    { gender, "Gender  =:= GenderInput"                },
-    { age, fun UserOptsModule:Function/2               },
-    { smoke_status, "SmokeStatus =:= SmokeStatusInput" },
-  ],
-
-%%%
-  actions = [
-    { eligibility, fun(InputList) -> eligibility end.         },
-    { unacceptability, fun(InputList) -> unacceptability end. }
-  ],
-
-%%%
-  table =
-    { columns, [eligible_state, gender, age, smoke_status],
-      actions, [eligibility, unacceptability]
-      rows,    [
-        [ ['VA', 'PA', 'NY'], 'Male', [20, 65], 'N', {[true]} ],
-        [ ['VA', 'PA', 'NY'], 'Female', [20, 65], 'N', {[true]} ],
-        [ ['CO', 'LV', 'CA', 'TX'], {[nil, true]} ],
-      ]
-    }
-}.
-
-
-h3. TODO
-
-- hide internal functions through -ifdef(TEST) declaration;
-- remove redundant '{columns, _, actions, _}' index;
-- switch decisions's table internal from lists to arrays;
-- implement DSL-based rules prerequisites such as '{ gender, "Gender  =:= GenderParam" }'
+First of all, see 'dm_table_acceptance_tests:make_decision_test_/0' scenario
