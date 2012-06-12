@@ -7,10 +7,15 @@ make_decision_test_() ->
     % decision table constructor (user defined callback)
     Init = fun(DMTable) ->
       DMTable:add_column(eligible_state, fun(EligibleStates, Input) -> lists:member(Input, EligibleStates) end),
-      DMTable:add_column(age, fun(Age, Input) -> Age =:= Input end),
-      DMTable:add_column(gender, fun(Gender, Input) ->  Gender =:= Input end),
+
+      % there are many options for define column operations (matchers, functions)
+      %% DMTable:add_column(age, fun(Age, Input) -> Age =:= Input end),
+      %% DMTable:add_column(age, fun dm_table_matchers:exactly_equal_to/2),
+      %% DMTable:add_column(age, exactly_equal_to), % simplified from 'fun dm_table_matchers:exactly_equal_to/2' form
+      DMTable:add_column(age, exactly_equal_to),
+      DMTable:add_column(gender, exactly_equal_to),
       %
-      DMTable:add_action(eligibility, fun(InputList) -> granted end),
+      DMTable:add_action(eligibility, fun(_InputList) -> granted end),
       %
       DMTable:add_decision([[], [19, nil]], [nil]),
       DMTable:add_decision([[], [66, nil]], [nil]),

@@ -22,12 +22,12 @@ new_2_function_test() ->
 
 
 assert_new_2_tests(E) ->
-  [{column, func}] = E:columns(),
-  [{action, func}] = E:actions().
+  [{column, _}] = E:columns(),
+  [{action, _}] = E:actions().
 
 init(E) ->
-  E:add_column(column, func),
-  E:add_action(action, func),
+  E:add_column(column, equal_to),
+  E:add_action(action, equal_to),
 
   E.
 
@@ -47,14 +47,14 @@ set_columns_test() ->
 add_column_test() ->
   E = dm_table:new(add_column_test),
 
-  E:add_column(column, func),
-  [{column, func}] = E:columns(),
+  E:add_column(column, equal_to),
+  [{column, _}] = E:columns(),
 
-  E:add_column(column2, func2),
-  [{column, func}, {column2, func2}] = E:columns(),
+  E:add_column(column2, equal_to),
+  [{column, _}, {column2, _}] = E:columns(),
 
-  E:add_column(column3, func3),
-  [{column, func}, {column2, func2}, {column3, func3}] = E:columns().
+  E:add_column(column3, equal_to),
+  [{column, _}, {column2, _}, {column3, _}] = E:columns().
 
 
 set_actions_test() ->

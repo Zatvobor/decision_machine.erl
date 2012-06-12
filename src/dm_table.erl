@@ -56,7 +56,10 @@ set_columns(ColumnsList) ->
   gen_server:cast(Name, {push_decision_table, NewT}).
 
 
-add_column(Atom, Func) ->
+add_column(Atom, Matcher) when is_atom(Matcher) ->
+  add_column(Atom, dm_table_matchers:to_function(Matcher));
+
+add_column(Atom, Func) when is_function(Func) ->
   set_columns(columns() ++ [{Atom, Func}]).
 
 
