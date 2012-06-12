@@ -17,7 +17,7 @@ before_each() ->
 
 map_column_functions_test_() ->
   Scenario = fun(Engine) ->
-    Actual = Engine:map_column_functions([c,d]),
+    Actual = Engine:map_columns_and_actions([c,d]),
 
     Expected = [[{input, c}, {func, fun_column_stub}, {n, 1}], [{input, d}, {func, fun_column_stub}, {n, 2}]],
 
@@ -30,7 +30,7 @@ map_column_functions_test_() ->
 
 map_cells_value_and_action_functions_test_() ->
   Scenario = fun(Engine) ->
-    InputListExtended = Engine:map_column_functions([c,d]),
+    InputListExtended = Engine:map_columns_and_actions([c,d]),
     Actual = Engine:map_cells_value_and_action_functions(InputListExtended, [ a, b, {[true, false, nil]}]),
 
     Expected = {

@@ -126,13 +126,13 @@ handle_call({fetch_decision_table}, _From, State) ->
 handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = State) ->
   Engine = dm_table_engine:new(C, A, T),
 
-  % 1 map column function to user's input list
-  InputListExtended = Engine:map_column_functions(InputList),
+  % 1) map column function to user's input list
+  LinkedInputList = Engine:map_columns_and_actions(InputList),
 
-  % 2 apply input for decision table, fire actions, return execution log
-  ActionExecutionLog = Engine:foreach_table_rows_tail(InputListExtended),
+  % 2) apply linked input to decision table: go through, fire actions and return execution log as tuple
+  Decisions = Engine:match_one(LinkedInputList),
 
-  {reply, ActionExecutionLog, State}.
+  {reply, Decisions, State}.
 
 
 handle_cast({push_decision_table, NewState}, _State) ->

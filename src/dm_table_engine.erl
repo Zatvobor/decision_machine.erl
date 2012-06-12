@@ -1,6 +1,6 @@
 -module(dm_table_engine, [Columns, Actions, Table]).
 
--export([map_column_functions/1, foreach_table_rows_tail/1]).
+-export([map_columns_and_actions/1, match_one/1]).
 
 -ifdef(TEST).
   -export([map_cells_value_and_action_functions/2]).
@@ -10,29 +10,29 @@
 
 %% @Public functions
 
-map_column_functions(InputList) ->
-  map_column_functions(InputList, 1, []).
+map_columns_and_actions(InputList) ->
+  map_columns_and_actions(InputList, 1, []).
 
 
-foreach_table_rows_tail(InputListExtended) ->
+match_one(InputListExtended) ->
   {rows, Rows} = Table,
-  foreach_table_rows_tail(InputListExtended, Rows, 1).
+  match_one(InputListExtended, Rows, 1).
 
 
 
 %% @Private functions
 
-map_column_functions(InputList, N, Acc) when length(InputList) >= N ->
+map_columns_and_actions(InputList, N, Acc) when length(InputList) >= N ->
   Input = lists:nth(N, InputList),
   {_, Func} = lists:nth(N, Columns),
   NewAcc = Acc ++ [[{input, Input}, {func, Func}, {n, N}]],
 
-  map_column_functions(InputList, N + 1, NewAcc);
+  map_columns_and_actions(InputList, N + 1, NewAcc);
 
-map_column_functions(_InputList, _N, Acc) -> Acc.
+map_columns_and_actions(_InputList, _N, Acc) -> Acc.
 
 
-foreach_table_rows_tail(InputListExtended, Rows, N) when length(Rows) >= N ->
+match_one(InputListExtended, Rows, N) when length(Rows) >= N ->
   {row, MappedCells, actions, MappedActions} = map_cells_value_and_action_functions(InputListExtended, lists:nth(N, Rows)),
 
   Runnerfun = fun(F) ->
@@ -42,10 +42,10 @@ foreach_table_rows_tail(InputListExtended, Rows, N) when length(Rows) >= N ->
 
   case walk_through_columns(MappedCells) of
     true  -> lists:map(Runnerfun, MappedActions);
-    false -> foreach_table_rows_tail(InputListExtended, Rows, N + 1)
+    false -> match_one(InputListExtended, Rows, N + 1)
   end;
 
-foreach_table_rows_tail(_InputListExtended, _Rows, _N) -> undefined.
+match_one(_InputListExtended, _Rows, _N) -> undefined.
 
 
 map_cells_value_and_action_functions(InputListExtended, Row) ->
