@@ -13,7 +13,7 @@
 
 % spawned process stuff (belongs to current object instance)
 -behavior(gen_server).
--record(decision_table, {columns = [], actions = [], table = {columns, [], actions, [], rows, [] }}).
+-record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
 
 -export([start_link/0, init/1, handle_call/3, handle_cast/2]).
 
@@ -49,9 +49,7 @@ columns(#decision_table{columns = C} = _T) ->
 
 set_columns(ColumnsList) ->
   T = gen_server:call(Name, {fetch_decision_table}),
-
-  NewSchema = rebuild_decision_table_schema(T, 2, ColumnsList),
-  NewT = T#decision_table{ columns = ColumnsList, table = NewSchema },
+  NewT = T#decision_table{ columns = ColumnsList },
 
   gen_server:cast(Name, {push_decision_table, NewT}).
 
@@ -72,9 +70,7 @@ actions(#decision_table{ actions = A } = _T) ->
 
 set_actions(ActionsList) ->
   T = gen_server:call(Name, {fetch_decision_table}),
-
-  NewSchema = rebuild_decision_table_schema(T, 4, ActionsList),
-  NewT = T#decision_table{ actions = ActionsList, table = NewSchema },
+  NewT = T#decision_table{ actions = ActionsList },
 
   gen_server:cast(Name, {push_decision_table, NewT}).
 
@@ -94,7 +90,7 @@ set_decisions(DecisionsList) ->
   T = gen_server:call(Name, {fetch_decision_table}),
   Table = table(T),
 
-  NewTable = setelement(6, Table, DecisionsList),
+  NewTable = setelement(2, Table, DecisionsList),
 
   NewT = T#decision_table{ table = NewTable },
 
@@ -102,7 +98,7 @@ set_decisions(DecisionsList) ->
 
 
 add_decision(Row, Actions) ->
-  {_, _, _, _, rows, RowsList} = table(),
+  {rows, RowsList} = table(),
   set_decisions(RowsList ++ ([Row ++ [ {Actions} ]])).
 
 
@@ -112,15 +108,6 @@ make_decision(InputList) ->
 
 
 %% @Inernal instance stuff
-
-get_decision_table() ->
-  gen_server:call(Name, {fetch_decision_table}).
-
-
-rebuild_decision_table_schema(T, Index, SourceList) ->
-  {columns, _, actions, _, _, _} = Table = table(T),
-  setelement(Index, Table, [L || {L, _} <- SourceList]).
-
 
 
 %% @Internal stuff for gen_server behavior

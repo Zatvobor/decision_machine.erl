@@ -38,10 +38,7 @@ set_columns_test() ->
   Columns = [{column, func}, {column2, func2}],
   E:set_columns(Columns),
 
-  Columns = E:columns(),
-
-  {columns, C, _, _, _, _} = E:table(),
-  C = [column, column2].
+  Columns = E:columns().
 
 
 add_column_test() ->
@@ -63,10 +60,7 @@ set_actions_test() ->
   Actions = [{action, func}, {action2, func2}],
   E:set_actions(Actions),
 
-  Actions = E:actions(),
-
-  {_, _, actions, A, _, _} = E:table(),
-  A = [action, action2].
+  Actions = E:actions().
 
 
 add_action_test() ->
@@ -88,7 +82,7 @@ set_decisions_test() ->
   Decisions = [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]],
   E:set_decisions(Decisions),
 
-  {_, _, _, _, rows, D} = E:table(),
+  {rows, D} = E:table(),
   Decisions = D.
 
 
@@ -97,11 +91,11 @@ add_decision_test() ->
 
   E:add_decision(['Y', 'Y', 'N'], [true]),
 
-  {_, _, _, _, rows, D } = E:table(),
+  {rows, D} = E:table(),
   [['Y', 'Y', 'N', {[true]}]] = D,
 
   E:add_decision(['Y', 'N', 'N'], [false]),
 
-  {_, _, _, _, rows, D1 } = E:table(),
+  {rows, D1} = E:table(),
 
   [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]] = D1.

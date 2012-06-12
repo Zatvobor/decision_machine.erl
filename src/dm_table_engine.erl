@@ -15,7 +15,7 @@ map_column_functions(InputList) ->
 
 
 foreach_table_rows_tail(InputListExtended) ->
-  { _, _, _, _, rows, Rows} = Table,
+  {rows, Rows} = Table,
   foreach_table_rows_tail(InputListExtended, Rows, 1).
 
 
@@ -29,7 +29,7 @@ map_column_functions(InputList, N, Acc) when length(InputList) >= N ->
 
   map_column_functions(InputList, N + 1, NewAcc);
 
-map_column_functions(InputList, N, Acc) -> Acc.
+map_column_functions(_InputList, _N, Acc) -> Acc.
 
 
 foreach_table_rows_tail(InputListExtended, Rows, N) when length(Rows) >= N ->
@@ -45,7 +45,7 @@ foreach_table_rows_tail(InputListExtended, Rows, N) when length(Rows) >= N ->
     false -> foreach_table_rows_tail(InputListExtended, Rows, N + 1)
   end;
 
-foreach_table_rows_tail(InputListExtended, Rows, N) -> undefined.
+foreach_table_rows_tail(_InputListExtended, _Rows, _N) -> undefined.
 
 
 map_cells_value_and_action_functions(InputListExtended, Row) ->
