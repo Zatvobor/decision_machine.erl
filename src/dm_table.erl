@@ -6,7 +6,7 @@
 -export([new/1, new/2]). % module initialization functions
 
 % module instance functions
--export([columns/0, columns/1, set_columns/1, add_column/2]).
+-export([name/0, columns/0, columns/1, set_columns/1, add_column/2]).
 -export([actions/0, actions/1, set_actions/1, add_action/2]).
 -export([table/0, table/1, set_decisions/1, add_decision/2]).
 -export([make_decision/1]).
@@ -39,6 +39,9 @@ new(Name, UserOptsFun) when is_function(UserOptsFun) ->
 
 
 %% @Public object instance methods
+
+name() -> Name.
+
 
 columns() ->
   columns(gen_server:call(Name, {fetch_decision_table})).
