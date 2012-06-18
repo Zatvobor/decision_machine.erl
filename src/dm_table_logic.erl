@@ -1,11 +1,10 @@
--module(dm_table_engine, [Columns, Actions, Table]).
+-module(dm_table_logic, [Columns, Actions, Table]).
 
 -export([map_columns_and_actions/1, match_one/1]).
 
 -ifdef(TEST).
   -export([map_cells_value_and_action_functions/2]).
 -endif.
-
 
 
 %% @Public functions

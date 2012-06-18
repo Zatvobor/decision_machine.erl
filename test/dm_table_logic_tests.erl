@@ -1,4 +1,4 @@
--module(dm_table_engine_tests).
+-module(dm_table_logic_tests).
 -include_lib("eunit/include/eunit.hrl").
 
 
@@ -13,11 +13,11 @@ before_each() ->
   A = [{title, fun_action_stub}],
   T = {undefined, undefined, undefined, undefined, rows, [[ a, b, {[true]}]]},
 
-  dm_table_engine:new(C,A,T).
+  dm_table_logic:new(C,A,T).
 
 map_column_functions_test_() ->
-  Scenario = fun(Engine) ->
-    Actual = Engine:map_columns_and_actions([c,d]),
+  Scenario = fun(Logic) ->
+    Actual = Logic:map_columns_and_actions([c,d]),
 
     Expected = [[{input, c}, {func, fun_column_stub}, {n, 1}], [{input, d}, {func, fun_column_stub}, {n, 2}]],
 
@@ -29,9 +29,9 @@ map_column_functions_test_() ->
 
 
 map_cells_value_and_action_functions_test_() ->
-  Scenario = fun(Engine) ->
-    InputListExtended = Engine:map_columns_and_actions([c,d]),
-    Actual = Engine:map_cells_value_and_action_functions(InputListExtended, [ a, b, {[true, false, nil]}]),
+  Scenario = fun(Logic) ->
+    InputListExtended = Logic:map_columns_and_actions([c,d]),
+    Actual = Logic:map_cells_value_and_action_functions(InputListExtended, [ a, b, {[true, false, nil]}]),
 
     Expected = {
       row,
