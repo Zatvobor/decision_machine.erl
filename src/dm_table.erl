@@ -15,7 +15,7 @@
 -behavior(gen_server).
 -record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
 
--export([start_link/1, init/1, terminate/2, code_change/3, handle_call/3]).
+-export([start_link/0, init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2]).
 
 
 
@@ -38,7 +38,7 @@ new(Name, UserOptsFun) when is_function(UserOptsFun) ->
   % 2. apply user defined callback
   UserOptsFun(Instance),
   % 3. initialize satelite process
-  Instance:start_link(Instance:get_tim()),
+  Instance:start_link(),
   % 4. return instance reference
   Instance.
 
@@ -56,7 +56,8 @@ get_tim() ->
 
 
 set_tim(Record) ->
-  ets:insert(dm_internal_tables_registry, {Name, Record}).
+  ets:insert(dm_internal_tables_registry, {Name, Record}),
+  gen_server:cast(Name, {tim_updated, Record}).
 
 
 columns() ->
@@ -117,11 +118,16 @@ make_decision(InputList) ->
 
 %% @Internal stuff for gen_server behavior
 
-start_link(Tim) ->
-  gen_server:start_link({local, Name}, THIS, Tim, []).
+start_link() ->
+  gen_server:start_link({local, Name}, THIS, [], []).
 
 
-init(Tim) ->
+init([]) ->
+  Tim = case ets:lookup(dm_internal_tables_registry, Name) of
+    [H|_T] -> {Name, Record} = H, Record;
+    _      -> #decision_table{}
+  end,
+
   {ok, Tim}.
 
 
@@ -144,3 +150,7 @@ handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{
   Decisions = Engine:match_one(LinkedInputList),
 
   {reply, Decisions, State}.
+
+
+handle_cast({tim_updated, Record}, _State) ->
+  {noreply, Record}.
