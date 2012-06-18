@@ -6,16 +6,16 @@
 -export([new/1, new/2]). % module initialization functions
 
 % module instance functions
--export([name/0, columns/0, columns/1, set_columns/1, add_column/2]).
--export([actions/0, actions/1, set_actions/1, add_action/2]).
--export([table/0, table/1, set_decisions/1, add_decision/2]).
+-export([name/0, get_tim/0, set_tim/1, columns/0, set_columns/1, add_column/2]).
+-export([actions/0, set_actions/1, add_action/2]).
+-export([table/0, set_decisions/1, add_decision/2]).
 -export([make_decision/1]).
 
 % spawned process stuff (belongs to current object instance)
 -behavior(gen_server).
 -record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
 
--export([start_link/0, init/1, handle_call/3, handle_cast/2]).
+-export([start_link/1, init/1, terminate/2, code_change/3, handle_call/3]).
 
 
 
@@ -30,10 +30,15 @@ new(Name, UserOptsModule) when is_atom(UserOptsModule) ->
 new(Name, UserOptsFun) when is_function(UserOptsFun) ->
   % 1. initialize p-module
   Instance = instance(Name, UserOptsFun),
-  % 2. initialize satelite process
-  Instance:start_link(),
-  % 3. apply user defined callback
+  % 1.1 init ets model registry
+  case ets:info(dm_internal_tables_registry) of
+    undefined -> ets:new(dm_internal_tables_registry, [set, public, named_table]);
+    _         -> undefined
+  end,
+  % 2. apply user defined callback
   UserOptsFun(Instance),
+  % 3. initialize satelite process
+  Instance:start_link(Instance:get_tim()),
   % 4. return instance reference
   Instance.
 
@@ -43,18 +48,25 @@ new(Name, UserOptsFun) when is_function(UserOptsFun) ->
 name() -> Name.
 
 
-columns() ->
-  columns(gen_server:call(Name, {fetch_decision_table})).
+get_tim() ->
+  case ets:lookup(dm_internal_tables_registry, Name) of
+    [H|_T] -> {Name, Record} = H, Record;
+    _      -> #decision_table{}
+  end.
 
-columns(#decision_table{columns = C} = _T) ->
+
+set_tim(Record) ->
+  ets:insert(dm_internal_tables_registry, {Name, Record}).
+
+
+columns() ->
+  #decision_table{columns = C} = get_tim(),
   C.
 
 
 set_columns(ColumnsList) ->
-  T = gen_server:call(Name, {fetch_decision_table}),
-  NewT = T#decision_table{ columns = ColumnsList },
-
-  gen_server:cast(Name, {push_decision_table, NewT}).
+  T = get_tim(),
+  set_tim(T#decision_table{ columns = ColumnsList }).
 
 
 add_column(Atom, Matcher) when is_atom(Matcher) ->
@@ -65,17 +77,13 @@ add_column(Atom, Func) when is_function(Func) ->
 
 
 actions() ->
-  actions(gen_server:call(Name, {fetch_decision_table})).
-
-actions(#decision_table{ actions = A } = _T) ->
+  #decision_table{ actions = A } = get_tim(),
   A.
 
 
 set_actions(ActionsList) ->
-  T = gen_server:call(Name, {fetch_decision_table}),
-  NewT = T#decision_table{ actions = ActionsList },
-
-  gen_server:cast(Name, {push_decision_table, NewT}).
+  T = get_tim(),
+  set_tim(T#decision_table{ actions = ActionsList }).
 
 
 add_action(Atom, Func) ->
@@ -83,21 +91,15 @@ add_action(Atom, Func) ->
 
 
 table() ->
-  table(gen_server:call(Name, {fetch_decision_table})).
-
-table(#decision_table{ table = Table } = _T) ->
-  Table.
+  #decision_table{ table = T } = get_tim(),
+  T.
 
 
 set_decisions(DecisionsList) ->
-  T = gen_server:call(Name, {fetch_decision_table}),
-  Table = table(T),
+  Table = table(),
+  T = get_tim(),
 
-  NewTable = setelement(2, Table, DecisionsList),
-
-  NewT = T#decision_table{ table = NewTable },
-
-  gen_server:cast(Name, {push_decision_table, NewT}).
+  set_tim(T#decision_table{ table = setelement(2, Table, DecisionsList) }).
 
 
 add_decision(Row, Actions) ->
@@ -115,16 +117,22 @@ make_decision(InputList) ->
 
 %% @Internal stuff for gen_server behavior
 
-start_link() ->
-  gen_server:start_link({local, Name}, THIS, [], []).
+start_link(Tim) ->
+  gen_server:start_link({local, Name}, THIS, Tim, []).
 
 
-init([]) ->
-  {ok, #decision_table{}}.
+init(Tim) ->
+  {ok, Tim}.
 
 
-handle_call({fetch_decision_table}, _From, State) ->
-  {reply, State, State};
+terminate(_Reason, _State) ->
+  ok.
+
+
+code_change(_OldVsn, State, _Extra) ->
+  {ok, State}.
+
+
 
 handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = State) ->
   Engine = dm_table_engine:new(C, A, T),
@@ -136,7 +144,3 @@ handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{
   Decisions = Engine:match_one(LinkedInputList),
 
   {reply, Decisions, State}.
-
-
-handle_cast({push_decision_table, NewState}, _State) ->
-  {noreply, NewState}.

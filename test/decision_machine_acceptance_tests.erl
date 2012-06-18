@@ -1,4 +1,4 @@
--module(decesion_machine_acceptance_tests).
+-module(decision_machine_acceptance_tests).
 -include_lib("eunit/include/eunit.hrl").
 
 
