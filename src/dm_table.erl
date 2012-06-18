@@ -11,11 +11,7 @@
 -export([table/0, set_decisions/1, add_decision/2]).
 -export([make_decision/1]).
 
-% spawned process stuff (belongs to current object instance)
--behavior(gen_server).
 -record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
-
--export([start_link/0, init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2]).
 
 
 
@@ -38,7 +34,7 @@ new(Name, UserOptsFun) when is_function(UserOptsFun) ->
   % 2. apply user defined callback
   UserOptsFun(Instance),
   % 3. initialize satelite process
-  Instance:start_link(),
+  dm_process:start_link(Name),
   % 4. return instance reference
   Instance.
 
@@ -110,47 +106,3 @@ add_decision(Row, Actions) ->
 
 make_decision(InputList) ->
   gen_server:call(Name, {find_match_and_execute_actions, InputList}).
-
-
-
-%% @Inernal instance stuff
-
-
-%% @Internal stuff for gen_server behavior
-
-start_link() ->
-  gen_server:start_link({local, Name}, THIS, [], []).
-
-
-init([]) ->
-  Tim = case ets:lookup(dm_internal_tables_registry, Name) of
-    [H|_T] -> {Name, Record} = H, Record;
-    _      -> #decision_table{}
-  end,
-
-  {ok, Tim}.
-
-
-terminate(_Reason, _State) ->
-  ok.
-
-
-code_change(_OldVsn, State, _Extra) ->
-  {ok, State}.
-
-
-
-handle_call({find_match_and_execute_actions, InputList}, _From, #decision_table{ columns = C, actions = A, table = T } = State) ->
-  Logic = dm_table_logic:new(C, A, T),
-
-  % 1) map column function to user's input list
-  LinkedInputList = Logic:map_columns_and_actions(InputList),
-
-  % 2) apply linked input to decision table: go through, fire actions and return execution log as tuple
-  Decisions = Logic:match_one(LinkedInputList),
-
-  {reply, Decisions, State}.
-
-
-handle_cast({tim_updated, Record}, _State) ->
-  {noreply, Record}.
