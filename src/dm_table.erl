@@ -26,15 +26,10 @@ new(Name, UserOptsModule) when is_atom(UserOptsModule) ->
 new(Name, UserOptsFun) when is_function(UserOptsFun) ->
   % 1. initialize p-module
   Instance = instance(Name, UserOptsFun),
-  % 1.1 init ets model registry
-  case ets:info(dm_internal_tables_registry) of
-    undefined -> ets:new(dm_internal_tables_registry, [set, public, named_table]);
-    _         -> undefined
-  end,
   % 2. apply user defined callback
   UserOptsFun(Instance),
   % 3. initialize satelite process
-  dm_process:start_link(Name),
+  supervisor:start_child(dm_process_sup, [Name]),
   % 4. return instance reference
   Instance.
 

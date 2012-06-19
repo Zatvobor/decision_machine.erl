@@ -4,7 +4,7 @@
 
 attach_test_() ->
   Background = fun() ->
-    ok = decision_machine:start()
+    ok % = application:start(decision_machine)
   end,
 
   Scenario = fun() ->

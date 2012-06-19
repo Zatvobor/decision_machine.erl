@@ -1,4 +1,4 @@
--module(decision_machine_sup).
+-module(dm_process_sup).
 -behaviour(supervisor).
 
 %% API
@@ -14,7 +14,7 @@ start_link() ->
 
 
 init([]) ->
-    {ok, { {one_for_all, 5, 10},
-      [{ dm_process_sup, {dm_process_sup, start_link, []}, permanent, 5000, supervisor, [dm_process_sup] }]
+    {ok, { {simple_one_for_one, 5, 10},
+      [{ dm_process, {dm_process, start_link, []}, transient, 5000, worker, [dm_process] }]
     }}.
 

@@ -6,6 +6,7 @@
 
 
 new_2_module_test() ->
+  application:start(decision_machine),
   {dm_table, new_2_module_test, _} = E = dm_table:new(new_2_module_test, dm_table_tests),
 
   ?assert(erlang:is_process_alive(whereis(new_2_module_test))),
