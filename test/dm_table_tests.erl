@@ -23,11 +23,11 @@ new_2_function_test() ->
 
 
 assert_new_2_tests(E) ->
-  [{column, _}] = E:columns(),
+  [{column, _}] = E:conditions(),
   [{action, _}] = E:actions().
 
 init(E) ->
-  E:add_column(column, equal_to),
+  E:add_condition(column, equal_to),
   E:add_action(action, equal_to),
 
   E.
@@ -36,23 +36,23 @@ init(E) ->
 set_columns_test() ->
   E = dm_table:new(set_columns_test),
 
-  Columns = [{column, func}, {column2, func2}],
-  E:set_columns(Columns),
+  Conditions = [{column, func}, {column2, func2}],
+  E:set_conditions(Conditions),
 
-  Columns = E:columns().
+  Conditions = E:conditions().
 
 
-add_column_test() ->
-  E = dm_table:new(add_column_test),
+add_condition_test() ->
+  E = dm_table:new(add_condition_test),
 
-  E:add_column(column, equal_to),
-  [{column, _}] = E:columns(),
+  E:add_condition(column, equal_to),
+  [{column, _}] = E:conditions(),
 
-  E:add_column(column2, equal_to),
-  [{column, _}, {column2, _}] = E:columns(),
+  E:add_condition(column2, equal_to),
+  [{column, _}, {column2, _}] = E:conditions(),
 
-  E:add_column(column3, equal_to),
-  [{column, _}, {column2, _}, {column3, _}] = E:columns().
+  E:add_condition(column3, equal_to),
+  [{column, _}, {column2, _}, {column3, _}] = E:conditions().
 
 
 set_actions_test() ->
@@ -80,19 +80,19 @@ add_action_test() ->
 set_decisions_test() ->
   E = dm_table:new(set_decisions_test),
 
-  Decisions = [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]],
-  E:set_decisions(Decisions),
+  Consequences = [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]],
+  E:set_consequences(Consequences),
 
-  Decisions = E:table().
+  Consequences = E:consequences().
 
 
 add_decision_test() ->
   E = dm_table:new(add_decision_test),
 
-  E:add_decision(['Y', 'Y', 'N'], [true]),
-  D = E:table(),
+  E:add_consequence(['Y', 'Y', 'N'], [true]),
+  D = E:consequences(),
   [['Y', 'Y', 'N', {[true]}]] = D,
 
-  E:add_decision(['Y', 'N', 'N'], [false]),
-  D1 = E:table(),
+  E:add_consequence(['Y', 'N', 'N'], [false]),
+  D1 = E:consequences(),
   [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]] = D1.

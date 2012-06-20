@@ -1,15 +1,20 @@
 %%
-%% For more details about API usage see: test/dm_table_acceptance_test.erl
+%% For more details about API usage see: test/dm_table_acceptance_tests.erl
 %%
 -module(dm_table, [Name, UserOptsModule]). % parameterized module
 
 -export([new/1, new/2]). % module initialization functions
 
 % module instance functions
--export([name/0, get_tim/0, set_tim/1, columns/0, set_columns/1, add_column/2]).
--export([actions/0, set_actions/1, add_action/2]).
--export([table/0, set_decisions/1, add_decision/2]).
--export([make_decision/1]).
+-export([
+  name/0, get_tim/0, set_tim/1,
+
+  conditions/0, set_conditions/1, add_condition/2,
+  actions/0, set_actions/1, add_action/2,
+  consequences/0, set_consequences/1, add_consequence/2,
+
+  make_decision/1
+]).
 
 -record(decision_table, {columns = [], actions = [], table = []}).
 
@@ -51,21 +56,21 @@ set_tim(Record) ->
   gen_server:cast(Name, {tim_updated, Record}).
 
 
-columns() ->
+conditions() ->
   #decision_table{columns = C} = get_tim(),
   C.
 
 
-set_columns(ColumnsList) ->
+set_conditions(ColumnsList) ->
   T = get_tim(),
   set_tim(T#decision_table{ columns = ColumnsList }).
 
 
-add_column(Atom, Matcher) when is_atom(Matcher) ->
-  add_column(Atom, dm_table_matchers:to_function(Matcher));
+add_condition(Atom, Matcher) when is_atom(Matcher) ->
+  add_condition(Atom, dm_table_matchers:to_function(Matcher));
 
-add_column(Atom, Func) when is_function(Func) ->
-  set_columns(columns() ++ [{Atom, Func}]).
+add_condition(Atom, Func) when is_function(Func) ->
+  set_conditions(conditions() ++ [{Atom, Func}]).
 
 
 actions() ->
@@ -82,18 +87,18 @@ add_action(Atom, Func) ->
   set_actions(actions() ++ [{Atom, Func}]).
 
 
-table() ->
+consequences() ->
   #decision_table{ table = T } = get_tim(),
   T.
 
 
-set_decisions(DecisionsList) ->
+set_consequences(DecisionsList) ->
   T = get_tim(),
   set_tim(T#decision_table{ table = DecisionsList }).
 
 
-add_decision(Row, Actions) ->
-  set_decisions(table() ++ ([Row ++ [ {Actions} ]])).
+add_consequence(Row, Actions) ->
+  set_consequences(consequences() ++ ([Row ++ [ {Actions} ]])).
 
 
 make_decision(InputList) ->

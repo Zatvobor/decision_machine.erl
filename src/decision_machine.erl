@@ -1,3 +1,6 @@
+%%
+%% For more details about API usage see: test/decision_machine_acceptance_tests.erl
+%%
 -module(decision_machine).
 
 -behaviour(application).
@@ -8,7 +11,7 @@
 -export([
   attach_new/1, attach_new/2,
 
-  insert/1, delete/1, lookup/1, member/1,
+  attach/1, delete/1, lookup/1, member/1,
 
   make_decision/2
 ]).
@@ -27,15 +30,16 @@ stop(_State) ->
 
 
 attach_new(TableName) ->
-  insert(dm_table:new(TableName)).
+  attach(dm_table:new(TableName)).
 
 attach_new(TableName, TableInit) ->
-  insert(dm_table:new(TableName, TableInit)).
+  attach(dm_table:new(TableName, TableInit)).
 
 
 
-insert(Table) ->
-  ets:insert(dm_tables_registry, {Table:name(), Table}).
+attach(Table) ->
+  ets:insert(dm_tables_registry, {Table:name(), Table}),
+  Table.
 
 
 delete(TableName) ->

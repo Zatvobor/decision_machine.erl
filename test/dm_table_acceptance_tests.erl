@@ -6,21 +6,21 @@ make_decision_test_() ->
   Background = fun() ->
     % decision table constructor (user defined callback)
     Init = fun(DMTable) ->
-      DMTable:add_column(eligible_state, fun(EligibleStates, Input) -> lists:member(Input, EligibleStates) end),
+      DMTable:add_condition(eligible_state, fun(EligibleStates, Input) -> lists:member(Input, EligibleStates) end),
 
-      % there are many options to define column operations (matchers, functions)
-      %% DMTable:add_column(age, fun(Age, Input) -> Age =:= Input end),
-      %% DMTable:add_column(age, fun dm_table_matchers:exactly_equal_to/2),
-      %% DMTable:add_column(age, exactly_equal_to), % simplified form from 'fun dm_table_matchers:exactly_equal_to/2'
-      DMTable:add_column(age, exactly_equal_to),
-      DMTable:add_column(gender, exactly_equal_to),
+      % there are many options to define column operations (aka matchers, functions)
+      %% DMTable:add_condition(age, fun(Age, Input) -> Age =:= Input end),
+      %% DMTable:add_condition(age, fun dm_table_matchers:exactly_equal_to/2),
+      %% DMTable:add_condition(age, exactly_equal_to), % simplified form from 'fun dm_table_matchers:exactly_equal_to/2'
+      DMTable:add_condition(age, exactly_equal_to),
+      DMTable:add_condition(gender, exactly_equal_to),
 
       DMTable:add_action(eligibility, fun(_InputList) -> granted end),
 
-      DMTable:add_decision([[], [19, nil]], [nil]),
-      DMTable:add_decision([[], [66, nil]], [nil]),
-      DMTable:add_decision([['VA', 'PA', 'NY'], [20, 65], 'Male'], [true]),
-      DMTable:add_decision([['VA', 'PA', 'NY'], [20, 65], 'Female'], [true])
+      DMTable:add_consequence([[], [19, nil]], [nil]),
+      DMTable:add_consequence([[], [66, nil]], [nil]),
+      DMTable:add_consequence([['VA', 'PA', 'NY'], [20, 65], 'Male'], [true]),
+      DMTable:add_consequence([['VA', 'PA', 'NY'], [20, 65], 'Female'], [true])
     end,
 
     dm_table:new(eligibility_rules, Init)

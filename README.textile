@@ -1,7 +1,9 @@
 h2. Abstraction
 
-Erlang based *experimental* implementation of "Decision tables":http://en.wikipedia.org/wiki/Decision_table. Decision tables are a precise yet compact way to model complicated logic.
+*experimental* Erlang based implementation of "Decision tables":http://en.wikipedia.org/wiki/Decision_table. Decision tables are a precise yet compact way to model complicated logic.
+
+It acts as OTP application, where each decision table works as child process (worker) being a part of supervision tree.
 
 h2. Usage
 
-First of all, see 'dm_table_acceptance_tests:make_decision_test_/0' scenario
+First of all, read 'test/decision_machine_acceptance_tests.erl' and 'test/dm_table_acceptance_tests.erl' acceptance tests

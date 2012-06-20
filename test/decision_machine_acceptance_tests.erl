@@ -9,7 +9,7 @@ attach_test_() ->
 
   Scenario = fun() ->
     % attach
-    {true, true} = {decision_machine:attach_new(alpha), decision_machine:attach_new(betta)},
+    {{dm_table, alpha, _}, {dm_table, betta, _}} = {decision_machine:attach_new(alpha), decision_machine:attach_new(betta)},
     {true, true} = {decision_machine:member(alpha), decision_machine:member(betta)},
 
     % delete
@@ -22,19 +22,21 @@ attach_test_() ->
     {error, unknown} = decision_machine:lookup(unknown)
   end,
 
-  {"Decision Machine: insert/delete/lookup/member",
+  {"Decision Machine: attach/delete/lookup/member operations",
     {setup, Background, Scenario}
   }.
 
 make_decision_test_() ->
   Background = fun() ->
     DMTable = dm_table:new(untitled),
-    DMTable:add_column(age, exactly_equal_to),
-    DMTable:add_action(eligibility, fun(_InputList) -> granted end),
-    DMTable:add_decision([10], [true]),
-    DMTable:add_decision([20], [false]),
 
-    decision_machine:insert(DMTable)
+    DMTable:add_condition(age, exactly_equal_to),
+    DMTable:add_action(eligibility, fun(_InputList) -> granted end),
+
+    DMTable:add_consequence([10], [true]),
+    DMTable:add_consequence([20], [false]),
+
+    decision_machine:attach(DMTable)
   end,
 
   Scenario = fun() ->
@@ -46,7 +48,6 @@ make_decision_test_() ->
     [] = decision_machine:make_decision(untitled, [20])
   end,
 
-  {"Decision Machine: make_decision",
+  {"Decision Machine: make_decision in general",
     {setup, Background, Scenario}
   }.
-
