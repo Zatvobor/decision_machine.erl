@@ -14,8 +14,7 @@ map_columns_and_actions(InputList) ->
 
 
 match_one(InputListExtended) ->
-  {rows, Rows} = Table,
-  match_one(InputListExtended, Rows, 1).
+  match_one(InputListExtended, Table, 1).
 
 
 

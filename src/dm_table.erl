@@ -11,7 +11,7 @@
 -export([table/0, set_decisions/1, add_decision/2]).
 -export([make_decision/1]).
 
--record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
+-record(decision_table, {columns = [], actions = [], table = []}).
 
 
 
@@ -88,15 +88,12 @@ table() ->
 
 
 set_decisions(DecisionsList) ->
-  Table = table(),
   T = get_tim(),
-
-  set_tim(T#decision_table{ table = setelement(2, Table, DecisionsList) }).
+  set_tim(T#decision_table{ table = DecisionsList }).
 
 
 add_decision(Row, Actions) ->
-  {rows, RowsList} = table(),
-  set_decisions(RowsList ++ ([Row ++ [ {Actions} ]])).
+  set_decisions(table() ++ ([Row ++ [ {Actions} ]])).
 
 
 make_decision(InputList) ->

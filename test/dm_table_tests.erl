@@ -83,20 +83,16 @@ set_decisions_test() ->
   Decisions = [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]],
   E:set_decisions(Decisions),
 
-  {rows, D} = E:table(),
-  Decisions = D.
+  Decisions = E:table().
 
 
 add_decision_test() ->
   E = dm_table:new(add_decision_test),
 
   E:add_decision(['Y', 'Y', 'N'], [true]),
-
-  {rows, D} = E:table(),
+  D = E:table(),
   [['Y', 'Y', 'N', {[true]}]] = D,
 
   E:add_decision(['Y', 'N', 'N'], [false]),
-
-  {rows, D1} = E:table(),
-
+  D1 = E:table(),
   [['Y', 'Y', 'N', {[true]}], ['Y', 'N', 'N', {[false]}]] = D1.

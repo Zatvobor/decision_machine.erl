@@ -2,7 +2,7 @@
 
 % spawned process stuff (belongs to current object instance)
 -behavior(gen_server).
--record(decision_table, {columns = [], actions = [], table = {rows, [] }}).
+-record(decision_table, {columns = [], actions = [], table = []}).
 
 -export([start_link/1, init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2]).
 
